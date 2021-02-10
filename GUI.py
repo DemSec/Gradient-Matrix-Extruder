@@ -1,14 +1,44 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-import os
+import os, sys
 from subprocess import Popen, PIPE
+from PIL import Image
+import numpy as np
 
-def browseFile1():
-   filePath = fd.askopenfilename()
-   location1.insert(0, filePath)
+imagePath1 = ""
+outputPath = os.getcwd() + "Output.txt"
+
+def browse_image1():
+   global imagePath1
+   imagePath1 = fd.askopenfilename()
+   location1.insert(0, imagePath1)
 
 args = ["X:\\Programs\\SolidWorks\\SOLIDWORKS\\SLDWORKS.exe", "/m", os.path.dirname(os.path.realpath(__file__)) + "\\Procedural Lens Script.swp"]
 #Popen(args, stdout=PIPE, stderr=PIPE)
+
+#read an image and return a 2d numpy array of pixels
+def readimage(file):
+   im = Image.open(file)
+   imgData = np.array(im.getdata()).reshape(im.size[0],im.size[1],3)
+   print(type(im))
+   print(type(im.size))
+   print(im.size)
+   print(im.format)
+   print(im.mode)
+   print(im)
+
+   return imgData
+
+def generate():
+   global imagePath1
+   data = readimage(imagePath1)
+   with open(outputPath,"w") as f:
+      for d in data:
+         for p in d:
+               #pixels are in gray scale so RGB values are the same [v,v,v] v=0 black v= 255 white
+               f.write(str(p[0])+" ")
+         f.write("\n")
+   #Popen(args, stdout=PIPE, stderr=PIPE)
 
 root = tk.Tk()
 
@@ -32,7 +62,7 @@ location1.grid(row=0, column=1, columnspan=6)
 #location2.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer2.bmp")
 #location3.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer3.bmp")
 
-button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browseFile1)
+button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image1)
 #button2 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
 #button3 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
 
@@ -85,7 +115,7 @@ outputBox = tk.Entry(root, width=50)
 outputBox.grid(row=4, column=1, columnspan=6)
 outputBox.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Lens.stl")
 
-generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=Popen(args, stdout=PIPE, stderr=PIPE))
+generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate)
 generate.grid(row=4, column=7)
 
 
