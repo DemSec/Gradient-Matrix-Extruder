@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 
 imagePath1 = ""
-outputPath = os.getcwd() + "Output.txt"
+outputPath = os.getcwd() + "\\Output.txt"
 
 def browse_image1():
    global imagePath1
@@ -19,24 +19,34 @@ args = ["X:\\Programs\\SolidWorks\\SOLIDWORKS\\SLDWORKS.exe", "/m", os.path.dirn
 #read an image and return a 2d numpy array of pixels
 def readimage(file):
    im = Image.open(file)
-   imgData = np.array(im.getdata()).reshape(im.size[0],im.size[1],3)
-   print(type(im))
-   print(type(im.size))
-   print(im.size)
-   print(im.format)
-   print(im.mode)
-   print(im)
+   imgData = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
+   #print(type(im))
+   #print(type(im.size))
+   #print(im.size)
+   #print(im.format)
+   #print(im.mode)
+   #print(im)
+   im.close()
 
    return imgData
 
 def generate():
    global imagePath1
    data = readimage(imagePath1)
+   #print(outputPath)
    with open(outputPath,"w") as f:
       for d in data:
          for p in d:
+            num = str(p[0])
+            if len(num) == 3:
                #pixels are in gray scale so RGB values are the same [v,v,v] v=0 black v= 255 white
-               f.write(str(p[0])+" ")
+               f.write(num + " ")
+            elif len(num) == 2:
+               f.write("0" + num + " ")
+            elif len(num) == 1:
+               f.write("00" + num + " ")
+            else:
+               print("Number outside of unsigned 8 bit value!")
          f.write("\n")
    #Popen(args, stdout=PIPE, stderr=PIPE)
 
