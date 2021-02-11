@@ -15,13 +15,16 @@ if SW_path.find("SOLIDWORKS\\") == -1:
 else:
    SW_path = SW_path[0:SW_path.find("SOLIDWORKS\\") + 11] + "SLDWORKS.exe"
 
-input_image_path = ""
-output_matrix_path = os.getcwd() + "\\Output.txt"
-output_STL_path = os.getcwd() + "\\Output STL\\"
-#SW_path = "X:\\Programs\\SolidWorks\\SOLIDWORKS\\SLDWORKS.exe"
-macro_path = os.path.dirname(os.path.realpath(__file__)) + "\\Procedural Lens Script.swp"
+# Using os.getcwd can be different
+# if run from command line from different directory:
+workspace_path = os.path.dirname(os.path.realpath(__file__))
 
-def browse_image1():
+input_image_path = ""
+output_matrix_path = workspace_path + "\\Output Matrices\\Layer1.txt"
+output_STL_path = workspace_path + "\\Output STL\\"
+macro_path = workspace_path + "\\Procedural Lens Script.swp"
+
+def browse_image():
    global input_image_path
    input_image_path = fd.askopenfilename()
    location1.insert(0, input_image_path)
@@ -29,30 +32,22 @@ def browse_image1():
 def run_macro():
    Popen([SW_path, "/m", macro_path], stdout=PIPE, stderr=PIPE)
 
-#read an image and return a 2d numpy array of pixels
+# Read image and return a 2d numpy array of pixels
 def readimage(file):
    im = Image.open(file)
    img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
-   #print(type(im))
-   #print(type(im.size))
-   #print(im.size)
-   #print(im.format)
-   #print(im.mode)
-   #print(im)
    im.close()
 
    return img_data
 
-def generate():
+def generate_matrix():
    global input_image_path
    data = readimage(input_image_path)
-   #print(outputPath)
    with open(output_matrix_path,"w") as f:
       for d in data:
          for p in d:
             num = str(p[0])
             if len(num) == 3:
-               #pixels are in gray scale so RGB values are the same [v,v,v] v=0 black v= 255 white
                f.write(num + " ")
             elif len(num) == 2:
                f.write("0" + num + " ")
@@ -61,7 +56,8 @@ def generate():
             else:
                print("Number outside of unsigned 8 bit value!")
          f.write("\n")
-   #Popen(args, stdout=PIPE, stderr=PIPE)
+   f.close()
+   run_macro()
 
 root = tk.Tk()
 
@@ -85,7 +81,7 @@ location1.grid(row=0, column=1, columnspan=6)
 #location2.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer2.bmp")
 #location3.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer3.bmp")
 
-button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image1)
+button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image)
 #button2 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
 #button3 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
 
@@ -138,7 +134,7 @@ outputBox = tk.Entry(root, width=50)
 outputBox.grid(row=4, column=1, columnspan=6)
 #outputBox.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Lens.stl")
 
-generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate)
+generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
 generate.grid(row=4, column=7)
 
 #openFile = tk.Button(root, text="Open File", padx=10, pady=5, fg="white", bg="#666666")
