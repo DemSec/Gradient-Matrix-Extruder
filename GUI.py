@@ -10,6 +10,7 @@ import numpy as np                    # Reading Images
 file_ext = ".SLDPRT"
 SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{file_ext}")
 SW_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_query}\shell\open\command")
+print(SW_path)
 if SW_path.find("SOLIDWORKS\\") == -1:
    print("SolidWorks not found, please browse to SolidWorks executable.")
 else:
@@ -24,10 +25,48 @@ output_matrix_path = workspace_path + "\\Output Matrices\\Layer1.txt"
 output_STL_path = workspace_path + "\\Output STL\\"
 macro_path = workspace_path + "\\Procedural Lens Script.swp"
 
+layer =[]
+Imglocation =[]
+imgtext = []
+button =[]
+label =[]
+width =[]
+widthBox =[]
+length =[]
+lengthBox =[]
+height =[]
+heightBox =[]
+
 def browse_image():
    global input_image_path
    input_image_path = fd.askopenfilename()
    location1.insert(0, input_image_path)
+   
+def add_layer():
+
+    i=len(layer)
+    
+    layer.append(tk.Label(root, text="Layer "+str(i)).grid(row=0+i*4, column=0))
+
+    imgtext.append(tk.StringVar())
+    Imglocation.append(tk.Entry(root, width=50,textvariable=imgtext[i]).grid(row=0+i*4, column=1, columnspan=6))
+
+    button.append(tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
+    button[i].grid(row=0+i*4, column=7)
+
+    
+    width.append(tk.Label(root, text="Width:").grid(row=3+i*4, column=1))
+    widthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=2))
+
+    length.append(tk.Label(root, text="Length:").grid(row=3+i*4, column=3))
+    lengthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=4))
+
+    height.append(tk.Label(root, text="Height:").grid(row=3+i*4, column=5))
+    heightBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=6))
+    
+    #update_footer()
+    
+
 
 def run_macro():
    Popen([SW_path, "/m", macro_path], stdout=PIPE, stderr=PIPE)
@@ -41,106 +80,83 @@ def readimage(file):
    return img_data
 
 def generate_matrix():
-   global input_image_path
-   data = readimage(input_image_path)
-   with open(output_matrix_path,"w") as f:
-      for d in data:
-         for p in d:
-            num = str(p[0])
-            if len(num) == 3:
-               f.write(num + " ")
-            elif len(num) == 2:
-               f.write("0" + num + " ")
-            elif len(num) == 1:
-               f.write("00" + num + " ")
-            else:
-               print("Number outside of unsigned 8 bit value!")
-         f.write("\n")
-   f.close()
-   run_macro()
+    global imgtext
+    for img in imgtext:
+       print(img.get())
+       '''
+       data = readimage(img.get())
+       with open(output_matrix_path,"w") as f:
+          for d in data:
+             for p in d:
+                num = str(p[0])
+                if len(num) == 3:
+                   f.write(num + " ")
+                elif len(num) == 2:
+                   f.write("0" + num + " ")
+                elif len(num) == 1:
+                   f.write("00" + num + " ")
+                else:
+                   print("Number outside of unsigned 8 bit value!")
+             f.write("\n")'''
+             
+        #run_macro()
+
+
+def update_footer():
+    global buttonAdd
+    global output
+    global outputBox
+    global generate
+    
+    i = len(layer)
+    
+    buttonAdd.grid(row=3+i*4, column=7)
+    output.grid(row=4+i*4, column=0)
+    outputBox.grid(row=4+i*4, column=1, columnspan=6)
+    generate.grid(row=4+i*4, column=7)
 
 root = tk.Tk()
 
-layer1 = tk.Label(root, text="Layer 1")
-#layer2 = tk.Label(root, text="Layer 2")
-#layer3 = tk.Label(root, text="Layer 3")
+NumLayers=4
+for i in range(NumLayers):
+    layer.append(tk.Label(root, text="Layer "+str(i)).grid(row=0+i*4, column=0))
 
-layer1.grid(row=0, column=0)
-#layer2.grid(row=1, column=0)
-#layer3.grid(row=2, column=0)
+    imgtext.append(tk.StringVar())
+    Imglocation.append(tk.Entry(root, width=50,textvariable=imgtext[i]).grid(row=0+i*4, column=1, columnspan=6))
 
-location1 = tk.Entry(root, width=50)
-#location2 = tk.Entry(root, width=50)
-#location3 = tk.Entry(root, width=50)
+    button.append(tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
+    button[i].grid(row=0+i*4, column=7)
 
-location1.grid(row=0, column=1, columnspan=6)
-#location2.grid(row=1, column=1, columnspan=6)
-#location3.grid(row=2, column=1, columnspan=6)
+    #label.append(tk.Label(root, text="RES:").grid(row=0+i*4, column=8))
+    
+    width.append(tk.Label(root, text="Width:").grid(row=3+i*4, column=1))
+    widthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=2))
 
-#location1.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer1.bmp")
-#location2.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer2.bmp")
-#location3.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer3.bmp")
+    length.append(tk.Label(root, text="Length:").grid(row=3+i*4, column=3))
+    lengthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=4))
 
-button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image)
-#button2 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
-#button3 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
-
-button1.grid(row=0, column=7)
-#button2.grid(row=1, column=7)
-#button3.grid(row=2, column=7)
-
-label1 = tk.Label(root, text="RES:")
-#label2 = tk.Label(root, text="RES:")
-#label3 = tk.Label(root, text="RES:")
-
-label1.grid(row=0, column=8)
-#label2.grid(row=1, column=8)
-#label3.grid(row=2, column=8)
-
-res1 = tk.Entry(root, width=4)
-#res2 = tk.Entry(root, width=4)
-#res3 = tk.Entry(root, width=4)
-
-res1.grid(row=0, column=9)
-#res2.grid(row=1, column=9)
-#res3.grid(row=2, column=9)
-
-res1.insert(0, "100")
-#res2.insert(0, "50")
-#res3.insert(0, "20")
+    height.append(tk.Label(root, text="Height:").grid(row=3+i*4, column=5))
+    heightBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=6))
 
 
-buttonAdd = tk.Button(root, text=" + ", padx=10, pady=5, fg="white", bg="#666666")
-buttonAdd.grid(row=3, column=7)
-
-width = tk.Label(root, text="Width:")
-width.grid(row=3, column=1)
-widthBox = tk.Entry(root, width=4)
-widthBox.grid(row=3, column=2)
-
-length = tk.Label(root, text="Length:")
-length.grid(row=3, column=3)
-lengthBox = tk.Entry(root, width=4)
-lengthBox.grid(row=3, column=4)
-
-height = tk.Label(root, text="Height:")
-height.grid(row=3, column=5)
-heightBox = tk.Entry(root, width=4)
-heightBox.grid(row=3, column=6)
 
 output = tk.Label(root, text="Output")
-output.grid(row=4, column=0)
+output.grid(row=4+len(layer)*4, column=0)
 outputBox = tk.Entry(root, width=50)
-outputBox.grid(row=4, column=1, columnspan=6)
+outputBox.grid(row=4+len(layer)*4, column=1, columnspan=6)
 #outputBox.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Lens.stl")
 
 generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
-generate.grid(row=4, column=7)
+generate.grid(row=4+len(layer)*4, column=7)
 
-#openFile = tk.Button(root, text="Open File", padx=10, pady=5, fg="white", bg="#666666")
-#openFile.pack()
+buttonAdd = tk.Button(root, text=" + ", padx=10, pady=5, fg="white", bg="#666666", command=add_layer)
+buttonAdd.grid(row=0, column=9)
 
-#runApps = tk.Button(root, text="Open File", padx=10, pady=5, fg="white", bg="#666666")
-#runApps.pack()
+
+
+   
+
+
+
 
 root.mainloop()
