@@ -1,10 +1,8 @@
+from tkinter import *                 # GUI
+from tkinter import ttk               # scrollbar
 import os                             # Locating path
 import winreg                         # Reading file extension assosiations
 from subprocess import Popen, PIPE    # Opening SolidWorks
-import tkinter as tk                  # Creating GUI
-from tkinter import filedialog as fd  # Browsing Files
-from tkinter import ttk
-from tkinter import *
 #from PIL import Image                 # Processing Images
 import numpy as np                    # Reading Images
 
@@ -27,6 +25,31 @@ output_matrix_path = workspace_path + "\\Output Matrices\\Layer1.txt"
 output_STL_path = workspace_path + "\\Output STL\\"
 macro_path = workspace_path + "\\Procedural Lens Script.swp"
 
+
+#GUI root element
+root = Tk()
+
+layerFrame=LabelFrame(root)
+commandFrame=Frame(root)
+commandFrame.pack(side=BOTTOM,fill="both",expand="yes",padx=10,pady=10)
+layerFrame.pack(fill="both",expand="yes",padx=10,pady=10)
+
+canvas = Canvas(layerFrame)
+
+canvas.pack(side=LEFT,fill="both",expand="yes")
+
+sb = ttk.Scrollbar(layerFrame,orient="vertical",command=canvas.yview)
+
+sb.pack(side=RIGHT,fill="y")
+canvas.configure(yscrollcommand=sb.set)
+
+canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
+
+frame = Frame(canvas)
+canvas.create_window((0,0),window=frame,anchor="nw")
+
+
+
 layer =[]
 Imglocation =[]
 imgtext = []
@@ -44,48 +67,11 @@ def browse_image():
    input_image_path = fd.askopenfilename()
    location1.insert(0, input_image_path)
    
-def add_layer():
-
-    i=len(layer)
-    
-    layer.append(tk.Label(root, text="Layer "+str(i)).grid(row=0+i*4, column=0))
-
-    imgtext.append(tk.StringVar())
-    Imglocation.append(tk.Entry(root, width=50,textvariable=imgtext[i]).grid(row=0+i*4, column=1, columnspan=6))
-
-    button.append(tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
-    button[i].grid(row=0+i*4, column=7)
-
-    
-    width.append(tk.Label(root, text="Width:").grid(row=3+i*4, column=1))
-    widthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=2))
-
-    length.append(tk.Label(root, text="Length:").grid(row=3+i*4, column=3))
-    lengthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=4))
-
-    height.append(tk.Label(root, text="Height:").grid(row=3+i*4, column=5))
-    heightBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=6))
-    
-    update_footer()
-    
-
-
-def run_macro():
-   Popen([SW_path, "/m", macro_path], stdout=PIPE, stderr=PIPE)
-
-# Read image and return a 2d numpy array of pixels
-def readimage(file):
-   im = Image.open(file)
-   img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
-   im.close()
-
-   return img_data
-
+   
 def generate_matrix():
     global imgtext
     for img in imgtext:
        print(img.get())
-       '''
        data = readimage(img.get())
        with open(output_matrix_path,"w") as f:
           for d in data:
@@ -99,88 +85,85 @@ def generate_matrix():
                    f.write("00" + num + " ")
                 else:
                    print("Number outside of unsigned 8 bit value!")
-             f.write("\n")'''
+             f.write("\n")
              
-        #run_macro()
+       run_macro()
+        
+        
+def run_macro():
+   Popen([SW_path, "/m", macro_path], stdout=PIPE, stderr=PIPE)
 
-
-def update_footer():
-    global buttonAdd
-    global output
-    global outputBox
-    global generate
+# Read image and return a 2d numpy array of pixels
+def readimage(file):
+   im = Image.open(file)
+   img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
+   im.close()
+        
+        
+def add_layer():
     
-    i = len(layer)
+    i=len(layer)
     
-    buttonAdd.grid(row=3+i*4, column=7)
-    output.grid(row=4+i*4, column=0)
-    outputBox.grid(row=4+i*4, column=1, columnspan=6)
-    generate.grid(row=4+i*4, column=7)
+    layer.append(Label(frame, text="Layer "+str(i)))
+    layer[-1].pack(padx = 10, pady=10)
+    
+    fileFrame = Frame(frame)
+    fileFrame.pack(side=TOP)
 
-root = tk.Tk()
+    imgtext.append(StringVar())
+    Imglocation.append(Entry(fileFrame, width=50,textvariable=imgtext[i]))
+    Imglocation[-1].pack(side=LEFT,padx = 10, pady=5)
 
-layersFrame = LabelFrame(root)
-canvas = Canvas(layersFrame)
+    button.append(Button(fileFrame, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
+    button[i].pack(side=RIGHT,padx = 10, pady=5)
 
-canvas.grid(row=0,column=0,rowspan=30, columnspan=10)
+    #label.append(tk.Label(root, text="RES:").grid(row=0+i*4, column=8))
+    dimentionFrame = Frame(frame)
+    dimentionFrame.pack(side=TOP)
+    
+    width.append(Label(dimentionFrame, text="Width:"))
+    width[-1].pack(side=LEFT,padx = 10, pady=10)
+    widthBox.append(Entry(dimentionFrame, width=4))
+    widthBox[-1].pack(side=LEFT,padx = 10, pady=10)
 
-scrollbar = ttk.Scrollbar(layersFrame,orient="vertical",command=canvas.yview)
-scrollbar.grid(row =0,column=10,rowspan=30, columnspan=10)
-canvas.configure(yscrollcommand=scrollbar.set)
+    length.append(Label(dimentionFrame, text="Length:"))
+    length[-1].pack(side=LEFT,padx = 10, pady=10)
+    lengthBox.append(Entry(dimentionFrame, width=4))
+    lengthBox[-1].pack(side=LEFT,padx = 10, pady=10)
 
-canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
+    height.append(Label(dimentionFrame, text="Height:"))
+    height[-1].pack(side=LEFT,padx = 10, pady=10)
+    heightBox.append(Entry(dimentionFrame, width=4))
+    heightBox[-1].pack(side=LEFT,padx = 10, pady=10)
 
-frame = Frame(canvas)
-canvas.create_window((0,0),window=frame,anchor="nw")
+
+
+
+
+
+
+
+
+
+
+
 
 NumLayers=4
 for i in range(NumLayers):
-    layer.append(tk.Label(frame, text="Layer "+str(i)))
-    layer[-1].grid(row=0+i*4, column=0)
-
-    imgtext.append(tk.StringVar())
-    Imglocation.append(tk.Entry(frame, width=50,textvariable=imgtext[i]))
-    Imglocation[-1].grid(row=0+i*4, column=1, columnspan=6)
-
-    button.append(tk.Button(frame, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
-    button[i].grid(row=0+i*4, column=7)
-
-    #label.append(tk.Label(root, text="RES:").grid(row=0+i*4, column=8))
+    add_layer()
     
-    width.append(tk.Label(frame, text="Width:"))
-    width[-1].grid(row=3+i*4, column=1)
-    widthBox.append(tk.Entry(frame, width=4))
-    width[-1].grid(row=3+i*4, column=2)
 
-    length.append(tk.Label(frame, text="Length:"))
-    length[-1].grid(row=3+i*4, column=3)
-    lengthBox.append(tk.Entry(frame, width=4))
-    lengthBox[-1].grid(row=3+i*4, column=4)
+#command frame elements that dont need to be replicated
+output = Label(commandFrame, text="Output")
+output.pack(side=LEFT,padx=10,pady=10)
 
-    height.append(tk.Label(frame, text="Height:"))
-    height[-1].grid(row=3+i*4, column=5)
-    heightBox.append(tk.Entry(frame, width=4))
-    heightBox[-1].grid(row=3+i*4, column=6)
+outputBox = Entry(commandFrame, width=50)
+outputBox.pack(side=LEFT,padx=10,pady=10)
 
+generate = Button(commandFrame, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
+generate.pack(side=LEFT,padx=10,pady=10)
 
-
-output = tk.Label(root, text="Output")
-output.grid(row=4+len(layer)*4, column=0)
-outputBox = tk.Entry(root, width=50)
-outputBox.grid(row=4+len(layer)*4, column=1, columnspan=6)
-#outputBox.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Lens.stl")
-
-generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
-generate.grid(row=4+len(layer)*4, column=7)
-
-buttonAdd = tk.Button(root, text=" + ", padx=10, pady=5, fg="white", bg="#666666", command=add_layer)
-buttonAdd.grid(row=0, column=9)
-
-
-
-   
-
-
-
+buttonAdd = Button(commandFrame, text=" + ", padx=10, pady=5, fg="white", bg="#666666", command=add_layer)
+buttonAdd.pack(side=LEFT,padx=10,pady=10)
 
 root.mainloop()
