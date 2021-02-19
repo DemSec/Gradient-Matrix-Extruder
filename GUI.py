@@ -3,7 +3,9 @@ import winreg                         # Reading file extension assosiations
 from subprocess import Popen, PIPE    # Opening SolidWorks
 import tkinter as tk                  # Creating GUI
 from tkinter import filedialog as fd  # Browsing Files
-from PIL import Image                 # Processing Images
+from tkinter import ttk
+from tkinter import *
+#from PIL import Image                 # Processing Images
 import numpy as np                    # Reading Images
 
 # Get SW executable path:
@@ -64,7 +66,7 @@ def add_layer():
     height.append(tk.Label(root, text="Height:").grid(row=3+i*4, column=5))
     heightBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=6))
     
-    #update_footer()
+    update_footer()
     
 
 
@@ -117,26 +119,48 @@ def update_footer():
 
 root = tk.Tk()
 
+layersFrame = LabelFrame(root)
+canvas = Canvas(layersFrame)
+
+canvas.grid(row=0,column=0,rowspan=30, columnspan=10)
+
+scrollbar = ttk.Scrollbar(layersFrame,orient="vertical",command=canvas.yview)
+scrollbar.grid(row =0,column=10,rowspan=30, columnspan=10)
+canvas.configure(yscrollcommand=scrollbar.set)
+
+canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
+
+frame = Frame(canvas)
+canvas.create_window((0,0),window=frame,anchor="nw")
+
 NumLayers=4
 for i in range(NumLayers):
-    layer.append(tk.Label(root, text="Layer "+str(i)).grid(row=0+i*4, column=0))
+    layer.append(tk.Label(frame, text="Layer "+str(i)))
+    layer[-1].grid(row=0+i*4, column=0)
 
     imgtext.append(tk.StringVar())
-    Imglocation.append(tk.Entry(root, width=50,textvariable=imgtext[i]).grid(row=0+i*4, column=1, columnspan=6))
+    Imglocation.append(tk.Entry(frame, width=50,textvariable=imgtext[i]))
+    Imglocation[-1].grid(row=0+i*4, column=1, columnspan=6)
 
-    button.append(tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
+    button.append(tk.Button(frame, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
     button[i].grid(row=0+i*4, column=7)
 
     #label.append(tk.Label(root, text="RES:").grid(row=0+i*4, column=8))
     
-    width.append(tk.Label(root, text="Width:").grid(row=3+i*4, column=1))
-    widthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=2))
+    width.append(tk.Label(frame, text="Width:"))
+    width[-1].grid(row=3+i*4, column=1)
+    widthBox.append(tk.Entry(frame, width=4))
+    width[-1].grid(row=3+i*4, column=2)
 
-    length.append(tk.Label(root, text="Length:").grid(row=3+i*4, column=3))
-    lengthBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=4))
+    length.append(tk.Label(frame, text="Length:"))
+    length[-1].grid(row=3+i*4, column=3)
+    lengthBox.append(tk.Entry(frame, width=4))
+    lengthBox[-1].grid(row=3+i*4, column=4)
 
-    height.append(tk.Label(root, text="Height:").grid(row=3+i*4, column=5))
-    heightBox.append(tk.Entry(root, width=4).grid(row=3+i*4, column=6))
+    height.append(tk.Label(frame, text="Height:"))
+    height[-1].grid(row=3+i*4, column=5)
+    heightBox.append(tk.Entry(frame, width=4))
+    heightBox[-1].grid(row=3+i*4, column=6)
 
 
 
