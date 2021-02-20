@@ -15,49 +15,99 @@ if SW_path.find("SOLIDWORKS\\") == -1:
 else:
    SW_path = SW_path[0:SW_path.find("SOLIDWORKS\\") + 11] + "SLDWORKS.exe"
 
-# Using os.getcwd can be different
-# if run from command line from different directory:
-workspace_path = os.path.dirname(os.path.realpath(__file__))
+# Using os.getcwd can be different if run from
+# command line from different directory, so use this instead:
+workspace_dir = os.path.dirname(os.path.realpath(__file__))
 
-input_image_path = ""
-output_matrix_path = workspace_path + "\\Output Matrices\\Layer1.txt"
-output_STL_path = workspace_path + "\\Output STL\\"
-macro_path = workspace_path + "\\Procedural Lens Script.swp"
+# Technically, paths can be directories,
+# but here I use 'path' to signify 'filepath'
+i_image_dir = workspace_dir + "\\Input BMP\\"
+i_image_path = ""
+i_image_name = ""
+o_matrix_dir = workspace_dir + "\\Output Matrices\\"
+o_STL_dir = workspace_dir + "\\Output STL\\"
+VBA_macro_path = workspace_dir + "\\Procedural Lens Script.swp"
+
 
 def browse_image():
-   global input_image_path
-   input_image_path = fd.askopenfilename()
-   location1.insert(0, input_image_path)
+   global i_image_path, i_image_name
+   # Note: FileDialog like 'askopenfilename' accepts **options:
+   # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
+   # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
+   i_image_path = fd.askopenfilename(initialdir=i_image_dir, filetypes=[('','.bmp')])
+   i_image_name = i_image_path.split('/')[-1].split('.')[0]
+   location1.insert(0, i_image_dir)
+
 
 def run_macro():
-   Popen([SW_path, "/m", macro_path], stdout=PIPE, stderr=PIPE)
+   # TODO: Opens a new SolidWorks process even if one already exists, fix
+   Popen([SW_path, "/m", VBA_macro_path], stdout=PIPE, stderr=PIPE)
 
-# Read image and return a 2d numpy array of pixels
-def readimage(file):
+
+def readimage_old(file):
    im = Image.open(file)
+   #im = im.convert('RGB')
+   #print(im.getpixel((0,0)))
+   #print(im.getpixel((0,1)))
+   #print(im.getpixel((1,0)))
    img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
    im.close()
-
    return img_data
 
-def generate_matrix():
-   global input_image_path
-   data = readimage(input_image_path)
-   with open(output_matrix_path,"w") as f:
-      for d in data:
-         for p in d:
-            num = str(p[0])
-            if len(num) == 3:
+
+def readimage(file):
+   im = Image.open(file)
+   return im.convert('RGB')
+
+
+def generate_matrix_old():
+   global i_image_dir
+   data = readimage_old(i_image_dir)
+   print(len(data))     # Number of columns (x)
+   print(len(data[0]))  # Number of rows (y)
+   with open(o_matrix_dir,"w") as f:
+      """
+      for y in range(len(data[0])//20):
+         for x in range(len(data)//20):
+            _sum = 0
+            for p in range(20):
+               for d in range(20):
+                  _sum = _sum + data[x*20+d,y*20+p,0]
+                  if y == 0 and x == 0:
+                     print(data[x*20+d,y*20+p,0])
+            ave = _sum // 400 * 99 // 255
+            num = str(ave)
+            if len(num) == 2:
                f.write(num + " ")
-            elif len(num) == 2:
-               f.write("0" + num + " ")
             elif len(num) == 1:
-               f.write("00" + num + " ")
+               f.write("0" + num + " ")
             else:
                print("Number outside of unsigned 8 bit value!")
          f.write("\n")
+      """
+      for d in range(len(data[0])):
+         for p in range(len(data)):
+            num = data[d,p,0]
+            text = format(num, '08b') + " "
+            f.write(text)
+         f.write("\n")
    f.close()
-   run_macro()
+   #run_macro()
+
+
+def generate_matrix():
+   img = readimage(i_image_path)
+   output_path = o_matrix_dir + i_image_name + ".txt"
+   with open(output_path,"w") as f:
+      for y in range(img.height):
+         for x in range(img.width):
+            R, G, B = img.getpixel((x,y))
+            num = (R + G + B) // 3 * 99 // 256
+            f.write(format(num, '02') + ' ')
+         f.write("\n")
+   f.close()
+   #run_macro()
+
 
 root = tk.Tk()
 
