@@ -5,6 +5,7 @@ import tkinter as tk                  # Creating GUI
 from tkinter import filedialog as fd  # Browsing Files
 from PIL import Image                 # Processing Images
 import numpy as np                    # Reading Images
+from math import ceil                 # ceil()
 
 # Get SW executable path:
 file_ext = ".SLDPRT"
@@ -28,6 +29,7 @@ o_matrix_dir = workspace_dir + "\\Output Matrices\\"
 o_STL_dir = workspace_dir + "\\Output STL\\"
 VBA_macro_path = workspace_dir + "\\Procedural Lens Script.swp"
 
+divisions = 20
 
 def browse_image():
    global i_image_path, i_image_name
@@ -46,10 +48,6 @@ def run_macro():
 
 def readimage_old(file):
    im = Image.open(file)
-   #im = im.convert('RGB')
-   #print(im.getpixel((0,0)))
-   #print(im.getpixel((0,1)))
-   #print(im.getpixel((1,0)))
    img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
    im.close()
    return img_data
@@ -66,25 +64,6 @@ def generate_matrix_old():
    print(len(data))     # Number of columns (x)
    print(len(data[0]))  # Number of rows (y)
    with open(o_matrix_dir,"w") as f:
-      """
-      for y in range(len(data[0])//20):
-         for x in range(len(data)//20):
-            _sum = 0
-            for p in range(20):
-               for d in range(20):
-                  _sum = _sum + data[x*20+d,y*20+p,0]
-                  if y == 0 and x == 0:
-                     print(data[x*20+d,y*20+p,0])
-            ave = _sum // 400 * 99 // 255
-            num = str(ave)
-            if len(num) == 2:
-               f.write(num + " ")
-            elif len(num) == 1:
-               f.write("0" + num + " ")
-            else:
-               print("Number outside of unsigned 8 bit value!")
-         f.write("\n")
-      """
       for d in range(len(data[0])):
          for p in range(len(data)):
             num = data[d,p,0]
@@ -96,15 +75,34 @@ def generate_matrix_old():
 
 
 def generate_matrix():
-   img = readimage(i_image_path)
+   im = readimage(i_image_path)
    output_path = o_matrix_dir + i_image_name + ".txt"
-   with open(output_path,"w") as f:
-      for y in range(img.height):
-         for x in range(img.width):
-            R, G, B = img.getpixel((x,y))
-            num = (R + G + B) // 3 * 99 // 256
-            f.write(format(num, '02') + ' ')
-         f.write("\n")
+   f = open(output_path,"w")
+
+   diameter = im.height if im.height > im.width else im.width
+   pix_per_div = diameter / divisions
+   hor_divisions = im.width / diameter * divisions
+   ver_divisions = im.height / diameter * divisions
+   for y in range(ver_divisions):
+      for x in range(hor_divisions):
+         _sum = 0
+         for j in range(ceil(pix_per_div)):
+            for i in range(ceil(pix_per_div)):
+               x * pix_per_div
+               R, G, B = im.getpixel((ceil(x*divisions+i),ceil(y*divisions+j)))
+               _sum += R + G + B
+         ave = round(_sum / 3 / pix_per_div ^ 2 * 99 / 255)
+         num = str(ave)
+         f.write(format(num, '02') + ' ')
+      f.write("\n")
+   """
+   for y in range(img.height):
+      for x in range(img.width):
+         R, G, B = img.getpixel((x,y))
+         num = (R + G + B) // 3 * 99 // 256
+         f.write(format(num, '02') + ' ')
+      f.write("\n")
+   """
    f.close()
    #run_macro()
 
