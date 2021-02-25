@@ -1,11 +1,9 @@
 import tkinter as tk                  # GUI
-#from tkinter import Label, Entry, Frame, Button, ttk, LEFT, TOP, RIGHT
-from tkinter import filedialog as fd  # Browsing Files
+from tkinter import filedialog as fd  # Browsing files
 import os                             # Locating path
 import winreg                         # Reading file extension assosiations
 from subprocess import Popen, PIPE    # Opening SolidWorks
-#import numpy as np                   # Reading Images
-from PIL import Image                 # Processing Images
+from PIL import Image                 # Reading and processing images
 from math import ceil                 # Ceiling funciton
 
 # Get SW executable path:
@@ -51,7 +49,7 @@ def browse_image():
    # Note: FileDialog like 'askopenfilename' accepts **options:
    # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
    # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
-   i_image_path = fd.askopenfilename(initialdir = i_image_dir, filetypes = [('','.bmp')])
+   i_image_path = fd.askopenfilename(initialdir = i_image_dir, filetypes = [('', '.bmp')])
    i_image_name = i_image_path.split('/')[-1].split('.')[0]
    #location1.insert(0, i_image_dir)
 
@@ -103,6 +101,7 @@ def readimage(file):
    return im.convert('RGB')
 
 
+# TODO: WIP, don't use
 def generate_matrix_reduced():
    im = readimage(i_image_path)
    output_path = o_matrix_dir + i_image_name + ".txt"
@@ -118,7 +117,7 @@ def generate_matrix_reduced():
          #pixel_amount = max((x + 1) * pix_per_div, im.width) - x * pix_per_div
          for j in range(ceil(pix_per_div)):
             for i in range(ceil(pix_per_div)):
-               R, G, B = im.getpixel((x*divisions+i,y*divisions+j))
+               R, G, B = im.getpixel((x * divisions + i,y * divisions + j))
                _sum += R + G + B
                pixel_amount += 1
          ave = round(_sum / 3 / pixel_amount * 99 / 255)
@@ -153,9 +152,9 @@ canvas = tk.Canvas(layerFrame)
 
 canvas.pack(side = tk.LEFT, fill = "both", expand = "yes")
 
-sb = tk.Scrollbar(layerFrame, orient="vertical", command=canvas.yview)
+sb = tk.Scrollbar(layerFrame, orient = "vertical", command = canvas.yview)
 
-sb.pack(side = tk.RIGHT, fill="y")
+sb.pack(side = tk.RIGHT, fill = "y")
 canvas.configure(yscrollcommand = sb.set)
 
 canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion = canvas.bbox('all')))
