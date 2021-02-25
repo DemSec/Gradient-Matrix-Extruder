@@ -1,9 +1,9 @@
+from tkinter import *                 # GUI
+from tkinter import ttk               # scrollbar
 import os                             # Locating path
 import winreg                         # Reading file extension assosiations
 from subprocess import Popen, PIPE    # Opening SolidWorks
-import tkinter as tk                  # Creating GUI
-from tkinter import filedialog as fd  # Browsing Files
-from PIL import Image                 # Processing Images
+#from PIL import Image                 # Processing Images
 import numpy as np                    # Reading Images
 from math import ceil                 # ceil()
 
@@ -11,6 +11,7 @@ from math import ceil                 # ceil()
 file_ext = ".SLDPRT"
 SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{file_ext}")
 SW_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_query}\shell\open\command")
+print(SW_path)
 if SW_path.find("SOLIDWORKS\\") == -1:
    print("SolidWorks not found, please browse to SolidWorks executable.")
 else:
@@ -31,7 +32,21 @@ VBA_macro_path = workspace_dir + "\\Procedural Lens Script.swp"
 
 divisions = 20
 
+
+layer =[]
+Imglocation =[]
+imgtext = []
+button =[]
+label =[]
+width =[]
+widthBox =[]
+length =[]
+lengthBox =[]
+height =[]
+heightBox =[]
+
 def browse_image():
+
    global i_image_path, i_image_name
    # Note: FileDialog like 'askopenfilename' accepts **options:
    # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
@@ -50,7 +65,46 @@ def readimage_old(file):
    im = Image.open(file)
    img_data = np.array(im.getdata()).reshape(im.size[0],im.size[1],1)
    im.close()
-   return img_data
+        
+        
+def add_layer():
+    
+    i=len(layer)
+    
+    layer.append(Label(frame, text="Layer "+str(i)))
+    layer[-1].pack(padx = 10, pady=10)
+    
+    fileFrame = Frame(frame)
+    fileFrame.pack(side=TOP)
+
+    imgtext.append(StringVar())
+    Imglocation.append(Entry(fileFrame, width=50,textvariable=imgtext[i]))
+    Imglocation[-1].pack(side=LEFT,padx = 10, pady=5)
+
+    button.append(Button(fileFrame, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image))
+    button[i].pack(side=RIGHT,padx = 10, pady=5)
+
+    #label.append(tk.Label(root, text="RES:").grid(row=0+i*4, column=8))
+    dimentionFrame = Frame(frame)
+    dimentionFrame.pack(side=TOP)
+    
+    width.append(Label(dimentionFrame, text="Width:"))
+    width[-1].pack(side=LEFT,padx = 10, pady=10)
+    widthBox.append(Entry(dimentionFrame, width=4))
+    widthBox[-1].pack(side=LEFT,padx = 10, pady=10)
+
+    length.append(Label(dimentionFrame, text="Length:"))
+    length[-1].pack(side=LEFT,padx = 10, pady=10)
+    lengthBox.append(Entry(dimentionFrame, width=4))
+    lengthBox[-1].pack(side=LEFT,padx = 10, pady=10)
+
+    height.append(Label(dimentionFrame, text="Height:"))
+    height[-1].pack(side=LEFT,padx = 10, pady=10)
+    heightBox.append(Entry(dimentionFrame, width=4))
+    heightBox[-1].pack(side=LEFT,padx = 10, pady=10)
+
+
+
 
 
 def readimage(file):
@@ -107,88 +161,45 @@ def generate_matrix():
    #run_macro()
 
 
-root = tk.Tk()
+#GUI root element
+root = Tk()
 
-layer1 = tk.Label(root, text="Layer 1")
-#layer2 = tk.Label(root, text="Layer 2")
-#layer3 = tk.Label(root, text="Layer 3")
+layerFrame=LabelFrame(root)
+commandFrame=Frame(root)
+commandFrame.pack(side=BOTTOM,fill="both",expand="yes",padx=10,pady=10)
+layerFrame.pack(fill="both",expand="yes",padx=10,pady=10)
 
-layer1.grid(row=0, column=0)
-#layer2.grid(row=1, column=0)
-#layer3.grid(row=2, column=0)
+canvas = Canvas(layerFrame)
 
-location1 = tk.Entry(root, width=50)
-#location2 = tk.Entry(root, width=50)
-#location3 = tk.Entry(root, width=50)
+canvas.pack(side=LEFT,fill="both",expand="yes")
 
-location1.grid(row=0, column=1, columnspan=6)
-#location2.grid(row=1, column=1, columnspan=6)
-#location3.grid(row=2, column=1, columnspan=6)
+sb = ttk.Scrollbar(layerFrame,orient="vertical",command=canvas.yview)
 
-#location1.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer1.bmp")
-#location2.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer2.bmp")
-#location3.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Layer3.bmp")
+sb.pack(side=RIGHT,fill="y")
+canvas.configure(yscrollcommand=sb.set)
 
-button1 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666", command=browse_image)
-#button2 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
-#button3 = tk.Button(root, text="...", padx=10, pady=5, fg="white", bg="#666666")
+canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
 
-button1.grid(row=0, column=7)
-#button2.grid(row=1, column=7)
-#button3.grid(row=2, column=7)
+frame = Frame(canvas)
+canvas.create_window((0,0),window=frame,anchor="nw")
 
-label1 = tk.Label(root, text="RES:")
-#label2 = tk.Label(root, text="RES:")
-#label3 = tk.Label(root, text="RES:")
+NumLayers=4
+for i in range(NumLayers):
+    add_layer()
+    
 
-label1.grid(row=0, column=8)
-#label2.grid(row=1, column=8)
-#label3.grid(row=2, column=8)
+#command frame elements that dont need to be replicated
+output = Label(commandFrame, text="Output")
+output.pack(side=LEFT,padx=10,pady=10)
 
-res1 = tk.Entry(root, width=4)
-#res2 = tk.Entry(root, width=4)
-#res3 = tk.Entry(root, width=4)
+outputBox = Entry(commandFrame, width=50)
+outputBox.pack(side=LEFT,padx=10,pady=10)
 
-res1.grid(row=0, column=9)
-#res2.grid(row=1, column=9)
-#res3.grid(row=2, column=9)
+generate = Button(commandFrame, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
+generate.pack(side=LEFT,padx=10,pady=10)
 
-res1.insert(0, "100")
-#res2.insert(0, "50")
-#res3.insert(0, "20")
-
-
-buttonAdd = tk.Button(root, text=" + ", padx=10, pady=5, fg="white", bg="#666666")
-buttonAdd.grid(row=3, column=7)
-
-width = tk.Label(root, text="Width:")
-width.grid(row=3, column=1)
-widthBox = tk.Entry(root, width=4)
-widthBox.grid(row=3, column=2)
-
-length = tk.Label(root, text="Length:")
-length.grid(row=3, column=3)
-lengthBox = tk.Entry(root, width=4)
-lengthBox.grid(row=3, column=4)
-
-height = tk.Label(root, text="Height:")
-height.grid(row=3, column=5)
-heightBox = tk.Entry(root, width=4)
-heightBox.grid(row=3, column=6)
-
-output = tk.Label(root, text="Output")
-output.grid(row=4, column=0)
-outputBox = tk.Entry(root, width=50)
-outputBox.grid(row=4, column=1, columnspan=6)
-#outputBox.insert(0, "C:\\Users\\David\\Desktop\\Lens\\Lens.stl")
-
-generate = tk.Button(root, text="Generate", padx=10, pady=5, fg="white", bg="#666666", command=generate_matrix)
-generate.grid(row=4, column=7)
-
-#openFile = tk.Button(root, text="Open File", padx=10, pady=5, fg="white", bg="#666666")
-#openFile.pack()
-
-#runApps = tk.Button(root, text="Open File", padx=10, pady=5, fg="white", bg="#666666")
-#runApps.pack()
+buttonAdd = Button(commandFrame, text=" + ", padx=10, pady=5, fg="white", bg="#666666", command=add_layer)
+buttonAdd.pack(side=LEFT,padx=10,pady=10)
 
 root.mainloop()
+
