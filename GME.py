@@ -20,6 +20,7 @@ def browse_sld():
 SW_ext = ".SLDPRT"
 SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_ext}")
 SW_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_query}\shell\open\command")
+print("SW query result: " + SW_path)
 if SW_path.find("SOLIDWORKS\\") != -1:
    SW_path = SW_path[0 : SW_path.find("SOLIDWORKS\\") + 11] + "SLDWORKS.exe"
    print("SolidWorks found: " + SW_path)
