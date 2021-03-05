@@ -8,13 +8,24 @@ from math import ceil, isnan          # Ceiling, IsNaN
 import numpy as np
 import h5py
 
+def browse_sld():
+   global SW_path
+   # Note: FileDialog like 'askopenfilename' accepts **options:
+   # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
+   # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
+   SW_path = fd.askopenfilename(filetypes = [('','.exe')])
+   print("SolidWorks path: " + SW_path)
+
 # Get SW executable path:
-file_ext = ".SLDPRT"
-SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{file_ext}")
+SW_ext = ".SLDPRT"
+SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_ext}")
 SW_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_query}\shell\open\command")
 if SW_path.find("SOLIDWORKS\\") != -1:
    SW_path = SW_path[0 : SW_path.find("SOLIDWORKS\\") + 11] + "SLDWORKS.exe"
-
+   print("SolidWorks found: " + SW_path)
+else:
+   print("SolidWorks not found, please browse to SLDWORKS.exe")
+   browse_sld()
 
 # Using os.getcwd can be different if run from
 # command line from different directory, so use this instead:
@@ -23,20 +34,20 @@ workspace_dir = os.path.dirname(os.path.realpath(__file__))
 # Technically, paths can be directories,
 # but here I use 'path' to signify 'filepath'
 i_matrix_name = "index_profile"
-i_matrix_extension = ".npy"
+i_matrix_ext = ".npy"
 i_matrix_dir = workspace_dir + "\\Input Matrix\\"
-i_matrix_path = i_matrix_dir + i_matrix_name + i_matrix_extension
+i_matrix_path = i_matrix_dir + i_matrix_name + i_matrix_ext
 o_matrix_dir = workspace_dir + "\\Output Matrices\\"
 VBA_macro_path = workspace_dir + "\\Square Grid.swp"
 
 def browse_npy():
-   global i_matrix_path, i_matrix_name, i_matrix_extension
+   global i_matrix_path, i_matrix_name, i_matrix_ext
    # Note: FileDialog like 'askopenfilename' accepts **options:
    # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
    # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
    i_matrix_path = fd.askopenfilename(initialdir = i_matrix_dir, filetypes = [('','.npy'),('','.h5py')])
    i_matrix_name = i_matrix_path.split('/')[-1].split('.')[0]
-   i_matrix_extension = i_matrix_path.split('.')[-1]
+   i_matrix_ext = i_matrix_path.split('.')[-1]
    # TODO: update i_matrix_dir
    inputBox.delete(0,300)
    inputBox.insert(0, i_matrix_path)
@@ -48,9 +59,11 @@ def run_macro():
 
 
 def generate_matrix():
-   if (i_matrix_extension == ".npy"):
+   print("Loading matrix from file: " + i_matrix_path)
+   print("Matrix file extension: " + i_matrix_ext)
+   if (i_matrix_ext == ".npy"):
       matrix = np.load(i_matrix_path)
-   elif (i_matrix_extension == ".h5py"):
+   elif (i_matrix_ext == ".h5py"):
       matrix = h5py.File(i_matrix_path, 'r')
    output_path = o_matrix_dir + i_matrix_name + ".txt"
 
