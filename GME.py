@@ -171,67 +171,86 @@ def height_changed(event):
 
 # GUI root element
 root = tk.Tk()
+controll_frame= tk.Frame(root) 
+veiw_frame= tk.Frame(root)
+controll_frame.pack(side = tk.TOP,fill=tk.BOTH)
+
+top_frame = tk.Frame(controll_frame)
+mid_frame = tk.Frame(controll_frame)
+botom_frame= tk.Frame(controll_frame)
 
 root.title("Gradient Matrix Extruder")
 
-browseLabel = tk.Label(root, text="Input Matrix:", pady=10)
-browseLabel.grid(row=0, column=0)
+#top row
 
-browseEntry = tk.Entry(root, width=80)
-browseEntry.grid(row=0, column=1, columnspan=8)
+browseLabel = tk.Label(top_frame, text="Input Matrix:", pady=10)
+browseLabel.pack(side = tk.LEFT)
 
-browseButton = tk.Button(root, text="Browse", padx=10, pady=10, fg="white", bg="#666666", command=browse_npy)
-browseButton.grid(row=0, column=9)
+browseEntry = tk.Entry(top_frame, width=80)
+browseEntry.pack(side = tk.LEFT)
 
-generateButton = tk.Button(root, text="Generate", padx=10, pady=10, fg="white", bg="#666666", command=run_macro)
-generateButton.grid(row=0, column=10)
+browseButton = tk.Button(top_frame, text="Browse", padx=10, pady=10, fg="white", bg="#666666", command=browse_npy)
+browseButton.pack(side = tk.LEFT)
 
-matALabel = tk.Label(root, text="Mat. A:", pady=10)
-matALabel.grid(row=1, column=1)
+generateButton = tk.Button(top_frame, text="Generate", padx=10, pady=10, fg="white", bg="#666666", command=run_macro)
+generateButton.pack(side = tk.LEFT)
 
-matAEntry = tk.Entry(root, width=10)
-matAEntry.grid(row=1, column=2)
+top_frame.pack(side = tk.LEFT)
 
-matBLabel = tk.Label(root, text="Mat. B:", pady=10)
-matBLabel.grid(row=1, column=3)
 
-matBEntry = tk.Entry(root, width=10)
-matBEntry.grid(row=1, column=4)
+matALabel = tk.Label(mid_frame, text="Mat. A:", pady=10)
+matALabel.pack(sid = tk.LEFT)
 
-layerLabel = tk.Label(root, text="Layer:", pady=10)
-layerLabel.grid(row=1, column=5)
+matAEntry = tk.Entry(mid_frame, width=10)
+matAEntry.pack(side = tk.LEFT)
 
-layerEntry = tk.Entry(root, width=10)
+matBLabel = tk.Label(mid_frame, text="Mat. B:", pady=10)
+matBLabel.pack(side = tk.LEFT)
+
+matBEntry = tk.Entry(mid_frame, width=10)
+matBEntry.pack(side = tk.LEFT)
+
+layerLabel = tk.Label(mid_frame, text="Layer:", pady=10)
+layerLabel.pack(side = tk.LEFT)
+
+layerEntry = tk.Entry(mid_frame, width=10)
 layerEntry.bind('<Return>',layer_changed)
-layerEntry.grid(row=1, column=6)
+layerEntry.pack(side = tk.LEFT)
 
-gridLabel = tk.Label(root, text="Grid:", pady=10)
-gridLabel.grid(row=1, column=7)
+gridLabel = tk.Label(mid_frame, text="Grid:", pady=10)
+gridLabel.pack(side = tk.LEFT)
 
-gridEntry = tk.Entry(root, width=10)
+gridEntry = tk.Entry(mid_frame, width=10)
 gridEntry.bind('<Return>',grid_changed)
-gridEntry.grid(row=1, column=8)
+gridEntry.pack(side = tk.LEFT)
 
-widthLabel = tk.Label(root, text="Width:", pady=10)
-widthLabel.grid(row=2, column=2)
+mid_frame.pack(side = tk.LEFT)
 
-widthEntry = tk.Entry(root, width=10)
+
+#botum entry boxes
+
+widthLabel = tk.Label(botom_frame, text="Width:", pady=10)
+widthLabel.pack(side = tk.LEFT)
+
+widthEntry = tk.Entry(botom_frame, width=10)
 widthEntry.bind('<Return>',width_changed)
-widthEntry.grid(row=2, column=3)
+widthEntry.pack(side = tk.LEFT)
 
-lengthLabel = tk.Label(root, text="Length:", pady=10)
-lengthLabel.grid(row=2, column=4)
+lengthLabel = tk.Label(botom_frame, text="Length:", pady=10)
+lengthLabel.pack(side = tk.LEFT)
 
-lengthEntry = tk.Entry(root, width=10)
+lengthEntry = tk.Entry(botom_frame, width=10)
 lengthEntry.bind('<Return>',length_changed)
-lengthEntry.grid(row=2, column=5)
+lengthEntry.pack(side = tk.LEFT)
 
-heightLabel = tk.Label(root, text="Height:", pady=10)
-heightLabel.grid(row=2, column=6)
+heightLabel = tk.Label(botom_frame, text="Height:", pady=10)
+heightLabel.pack(side = tk.LEFT)
 
-heightEntry = tk.Entry(root, width=10)
+heightEntry = tk.Entry(botom_frame, width=10)
 heightEntry.bind('<Return>',height_changed)
-heightEntry.grid(row=2, column=7)
+heightEntry.pack(side = tk.LEFT)
+
+botom_frame.pack(side = tk.BOTTOM)
 
 # try:
 #    load_matrix()
