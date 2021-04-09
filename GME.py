@@ -199,30 +199,30 @@ veiw_frame.pack(side = tk.TOP)
 
 
 matALabel = tk.Label(mid_frame, text="Mat. A:", pady=10)
-matALabel.pack(sid = tk.LEFT)
+matALabel.pack(sid = tk.LEFT, padx=10, pady=10)
 
 matAEntry = tk.Entry(mid_frame, width=10)
-matAEntry.pack(side = tk.LEFT)
+matAEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 matBLabel = tk.Label(mid_frame, text="Mat. B:", pady=10)
-matBLabel.pack(side = tk.LEFT)
+matBLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 matBEntry = tk.Entry(mid_frame, width=10)
-matBEntry.pack(side = tk.LEFT)
+matBEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 layerLabel = tk.Label(mid_frame, text="Layer:", pady=10)
-layerLabel.pack(side = tk.LEFT)
+layerLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 layerEntry = tk.Entry(mid_frame, width=10)
 layerEntry.bind('<Return>',layer_changed)
-layerEntry.pack(side = tk.LEFT)
+layerEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 gridLabel = tk.Label(mid_frame, text="Grid:", pady=10)
-gridLabel.pack(side = tk.LEFT)
+gridLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 gridEntry = tk.Entry(mid_frame, width=10)
 gridEntry.bind('<Return>',grid_changed)
-gridEntry.pack(side = tk.LEFT)
+gridEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 mid_frame.pack(side = tk.TOP)
 
@@ -230,25 +230,25 @@ mid_frame.pack(side = tk.TOP)
 #botum entry boxes
 
 widthLabel = tk.Label(botom_frame, text="Width:", pady=10)
-widthLabel.pack(side = tk.LEFT)
+widthLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 widthEntry = tk.Entry(botom_frame, width=10)
 widthEntry.bind('<Return>',width_changed)
-widthEntry.pack(side = tk.LEFT)
+widthEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 lengthLabel = tk.Label(botom_frame, text="Length:", pady=10)
-lengthLabel.pack(side = tk.LEFT)
+lengthLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 lengthEntry = tk.Entry(botom_frame, width=10)
 lengthEntry.bind('<Return>',length_changed)
-lengthEntry.pack(side = tk.LEFT)
+lengthEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 heightLabel = tk.Label(botom_frame, text="Height:", pady=10)
-heightLabel.pack(side = tk.LEFT)
+heightLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 heightEntry = tk.Entry(botom_frame, width=10)
 heightEntry.bind('<Return>',height_changed)
-heightEntry.pack(side = tk.LEFT)
+heightEntry.pack(side = tk.LEFT,padx=10, pady=10)
 
 botom_frame.pack(side = tk.BOTTOM)
 controll_frame.pack(side = tk.TOP,fill=tk.BOTH)
