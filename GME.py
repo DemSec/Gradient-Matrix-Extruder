@@ -22,7 +22,7 @@ def browse_sld():
    # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
    SW_path = fd.askopenfilename(filetypes = [('','.exe')])
    print("SolidWorks path: " + SW_path)
-
+'''
 # Get SW executable path:
 SW_ext = ".SLDPRT"
 SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_ext}")
@@ -51,7 +51,7 @@ VBA_macro_path = workspace_dir + "/Square Grid.swp"
 matrix = np.matrix
 matrix_downscaled = np.matrix
 matrix_shape = (1,1,1)
-
+'''
 def browse_npy():
    global i_matrix_path, i_matrix_name, i_matrix_ext
    # Note: FileDialog like 'askopenfilename' accepts **options:
@@ -173,7 +173,7 @@ def height_changed(event):
 root = tk.Tk()
 controll_frame= tk.Frame(root) 
 veiw_frame= tk.Frame(root)
-controll_frame.pack(side = tk.TOP,fill=tk.BOTH)
+
 
 top_frame = tk.Frame(controll_frame)
 mid_frame = tk.Frame(controll_frame)
@@ -183,19 +183,19 @@ root.title("Gradient Matrix Extruder")
 
 #top row
 
-browseLabel = tk.Label(top_frame, text="Input Matrix:", pady=10)
+browseLabel = tk.Label(veiw_frame, text="Input Matrix:", pady=10)
 browseLabel.pack(side = tk.LEFT)
 
-browseEntry = tk.Entry(top_frame, width=80)
+browseEntry = tk.Entry(veiw_frame, width=80)
 browseEntry.pack(side = tk.LEFT)
 
-browseButton = tk.Button(top_frame, text="Browse", padx=10, pady=10, fg="white", bg="#666666", command=browse_npy)
+browseButton = tk.Button(veiw_frame, text="Browse", padx=10, pady=10, fg="white", bg="#666666", command=browse_npy)
 browseButton.pack(side = tk.LEFT)
 
-generateButton = tk.Button(top_frame, text="Generate", padx=10, pady=10, fg="white", bg="#666666", command=run_macro)
+generateButton = tk.Button(veiw_frame, text="Generate", padx=10, pady=10, fg="white", bg="#666666", command=run_macro)
 generateButton.pack(side = tk.LEFT)
 
-top_frame.pack(side = tk.LEFT)
+veiw_frame.pack(side = tk.TOP)
 
 
 matALabel = tk.Label(mid_frame, text="Mat. A:", pady=10)
@@ -224,7 +224,7 @@ gridEntry = tk.Entry(mid_frame, width=10)
 gridEntry.bind('<Return>',grid_changed)
 gridEntry.pack(side = tk.LEFT)
 
-mid_frame.pack(side = tk.LEFT)
+mid_frame.pack(side = tk.TOP)
 
 
 #botum entry boxes
@@ -251,7 +251,8 @@ heightEntry.bind('<Return>',height_changed)
 heightEntry.pack(side = tk.LEFT)
 
 botom_frame.pack(side = tk.BOTTOM)
-
+controll_frame.pack(side = tk.TOP,fill=tk.BOTH)
+veiw_frame.pack(side = tk.BOTTOM)
 # try:
 #    load_matrix()
 # except Exception:
