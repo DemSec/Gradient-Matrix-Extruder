@@ -1,6 +1,6 @@
 import tkinter as tk                  # GUI
 from tkinter import filedialog as fd  # Browsing files
-import os                             # Locating SolidWorks path
+import os                             # Locating path
 import winreg                         # Reading file extension assosiations
 from subprocess import Popen, PIPE    # Opening SolidWorks
 from math import ceil, isnan          # Ceiling, IsNaN
@@ -21,15 +21,15 @@ def browse_sld():
    # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
    # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
    SW_path = fd.askopenfilename(filetypes = [('','.exe')])
-   print("Blender path: " + SW_path)
+   print("SolidWorks path: " + SW_path)
 
 # Get SW executable path:
-SW_ext = ".blend"
+SW_ext = ".SLDPRT"
 SW_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_ext}")
 SW_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{SW_query}\shell\open\command")
-print("Blender query result: " + SW_path)
-if SW_path.find("Blender\\") != -1:
-   SW_path = SW_path[0 : SW_path.find("Blender\\") + 11] + "SLDWORKS.exe"
+print("SW query result: " + SW_path)
+if SW_path.find("SOLIDWORKS\\") != -1:
+   SW_path = SW_path[0 : SW_path.find("SOLIDWORKS\\") + 11] + "SLDWORKS.exe"
    print("SolidWorks found: " + SW_path)
 else:
    print("SolidWorks not found, please browse to SLDWORKS.exe")
@@ -171,67 +171,86 @@ def height_changed(event):
 
 # GUI root element
 root = tk.Tk()
+controll_frame= tk.Frame(root) 
+veiw_frame= tk.Frame(root)
+controll_frame.pack(side = tk.TOP,fill=tk.BOTH)
+
+top_frame = tk.Frame(controll_frame)
+mid_frame = tk.Frame(controll_frame)
+botom_frame= tk.Frame(controll_frame)
 
 root.title("Gradient Matrix Extruder")
 
-browseLabel = tk.Label(root, text="Input Matrix:", pady=10)
-browseLabel.grid(row=0, column=0)
+#top row
 
-browseEntry = tk.Entry(root, width=80)
-browseEntry.grid(row=0, column=1, columnspan=8)
+browseLabel = tk.Label(top_frame, text="Input Matrix:", pady=10)
+browseLabel.pack(side = tk.LEFT)
 
-browseButton = tk.Button(root, text="Browse", padx=10, pady=10, fg="white", bg="#666666")#, command=browse_npy)
-browseButton.grid(row=0, column=9)
+browseEntry = tk.Entry(top_frame, width=80)
+browseEntry.pack(side = tk.LEFT)
 
-generateButton = tk.Button(root, text="Generate", padx=10, pady=10, fg="white", bg="#666666")#, command=run_macro)
-generateButton.grid(row=0, column=10)
+browseButton = tk.Button(top_frame, text="Browse", padx=10, pady=10, fg="white", bg="#666666", command=browse_npy)
+browseButton.pack(side = tk.LEFT)
 
-matALabel = tk.Label(root, text="Mat. A:", pady=10)
-matALabel.grid(row=1, column=1)
+generateButton = tk.Button(top_frame, text="Generate", padx=10, pady=10, fg="white", bg="#666666", command=run_macro)
+generateButton.pack(side = tk.LEFT)
 
-matAEntry = tk.Entry(root, width=10)
-matAEntry.grid(row=1, column=2)
+top_frame.pack(side = tk.LEFT)
 
-matBLabel = tk.Label(root, text="Mat. B:", pady=10)
-matBLabel.grid(row=1, column=3)
 
-matBEntry = tk.Entry(root, width=10)
-matBEntry.grid(row=1, column=4)
+matALabel = tk.Label(mid_frame, text="Mat. A:", pady=10)
+matALabel.pack(sid = tk.LEFT)
 
-layerLabel = tk.Label(root, text="Layer:", pady=10)
-layerLabel.grid(row=1, column=5)
+matAEntry = tk.Entry(mid_frame, width=10)
+matAEntry.pack(side = tk.LEFT)
 
-layerEntry = tk.Entry(root, width=10)
-#layerEntry.bind('<Return>',layer_changed)
-layerEntry.grid(row=1, column=6)
+matBLabel = tk.Label(mid_frame, text="Mat. B:", pady=10)
+matBLabel.pack(side = tk.LEFT)
 
-gridLabel = tk.Label(root, text="Grid:", pady=10)
-gridLabel.grid(row=1, column=7)
+matBEntry = tk.Entry(mid_frame, width=10)
+matBEntry.pack(side = tk.LEFT)
 
-gridEntry = tk.Entry(root, width=10)
-#gridEntry.bind('<Return>',grid_changed)
-gridEntry.grid(row=1, column=8)
+layerLabel = tk.Label(mid_frame, text="Layer:", pady=10)
+layerLabel.pack(side = tk.LEFT)
 
-widthLabel = tk.Label(root, text="Width:", pady=10)
-widthLabel.grid(row=2, column=2)
+layerEntry = tk.Entry(mid_frame, width=10)
+layerEntry.bind('<Return>',layer_changed)
+layerEntry.pack(side = tk.LEFT)
 
-widthEntry = tk.Entry(root, width=10)
-#widthEntry.bind('<Return>',width_changed)
-widthEntry.grid(row=2, column=3)
+gridLabel = tk.Label(mid_frame, text="Grid:", pady=10)
+gridLabel.pack(side = tk.LEFT)
 
-lengthLabel = tk.Label(root, text="Length:", pady=10)
-lengthLabel.grid(row=2, column=4)
+gridEntry = tk.Entry(mid_frame, width=10)
+gridEntry.bind('<Return>',grid_changed)
+gridEntry.pack(side = tk.LEFT)
 
-lengthEntry = tk.Entry(root, width=10)
-#lengthEntry.bind('<Return>',length_changed)
-lengthEntry.grid(row=2, column=5)
+mid_frame.pack(side = tk.LEFT)
 
-heightLabel = tk.Label(root, text="Height:", pady=10)
-heightLabel.grid(row=2, column=6)
 
-heightEntry = tk.Entry(root, width=10)
-#heightEntry.bind('<Return>',height_changed)
-heightEntry.grid(row=2, column=7)
+#botum entry boxes
+
+widthLabel = tk.Label(botom_frame, text="Width:", pady=10)
+widthLabel.pack(side = tk.LEFT)
+
+widthEntry = tk.Entry(botom_frame, width=10)
+widthEntry.bind('<Return>',width_changed)
+widthEntry.pack(side = tk.LEFT)
+
+lengthLabel = tk.Label(botom_frame, text="Length:", pady=10)
+lengthLabel.pack(side = tk.LEFT)
+
+lengthEntry = tk.Entry(botom_frame, width=10)
+lengthEntry.bind('<Return>',length_changed)
+lengthEntry.pack(side = tk.LEFT)
+
+heightLabel = tk.Label(botom_frame, text="Height:", pady=10)
+heightLabel.pack(side = tk.LEFT)
+
+heightEntry = tk.Entry(botom_frame, width=10)
+heightEntry.bind('<Return>',height_changed)
+heightEntry.pack(side = tk.LEFT)
+
+botom_frame.pack(side = tk.BOTTOM)
 
 # try:
 #    load_matrix()
