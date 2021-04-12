@@ -39,7 +39,7 @@ def browse_npy():
    load_matrix()
 
 def load_settings():
-   global i_matrix_path, MatA, MatB, width, length, height, grid
+   global i_matrix_path, MatA, MatB, width, length, height, layer, grid
    print("Loading settings: " + i_settings_path)
    # read settings
    with open(i_settings_path) as f:
@@ -58,6 +58,8 @@ def load_settings():
          length = float(text.split("=")[1])
       elif text.find("height") != -1:
          height = float(text.split("=")[1])
+      elif text.find("layer") != -1:
+         layer = float(text.split("=")[1])
       elif text.find("grid") != -1:
          grid = float(text.split("=")[1])
 
