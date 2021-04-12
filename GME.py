@@ -4,18 +4,18 @@ from tkinter import ttk                 # StringVar
 from tkinter.messagebox import showinfo # MessageBox
 import os                               # Locating path
 import winreg                           # Reading file extension assosiations
-from subprocess import Popen, PIPE      # Opening SolidWorks
+from subprocess import Popen, PIPE      # Opening Blender
 from math import ceil, isnan            # Ceiling, IsNaN
-import numpy as np
-import h5py
-import matplotlib.pyplot as plt
+import numpy as np                      # Numpy 3D array/matrix
+import h5py                             # Alternative to numpy array
 
-import matplotlib
-matplotlib.use('TkAgg')
-from numpy import MAXDIMS, arange, sin, pi
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-import sys
+# import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('TkAgg')
+# from numpy import MAXDIMS, arange, sin, pi
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# from matplotlib.figure import Figure
+# import sys
 
 def browse_blender():
    global blender_path
