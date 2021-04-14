@@ -125,9 +125,9 @@ def run_macro():
    # check if blender is running
    running = False
    for pid in psutil.pids():
-        p = psutil.Process(pid)
-        if p.name() == "blender.exe" and len(p.cmdline()) > 1 and blender_macro_file in p.cmdline()[1]:
-            running = True
+      p = psutil.Process(pid)
+      if p.name() == "blender.exe" and len(p.cmdline()) > 1 and blender_macro_file in p.cmdline()[1]:
+         running = True
    # run blender if not open
    if not running:
       Popen([blender_path, blender_macro_path], stdout = PIPE, stderr = PIPE)
