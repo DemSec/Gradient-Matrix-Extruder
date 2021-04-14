@@ -1,8 +1,0 @@
-D:/Stuff/GitHub/Gradient-Matrix-Extruder/dist/Input Matrix/index_profile.npy
-MatA=1.38
-MatB=1.5
-width=10.0
-length=10.0
-height=1.59
-layer=10.0
-grid=10.0

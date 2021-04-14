@@ -8,6 +8,7 @@ from subprocess import Popen, PIPE      # Opening Blender
 from math import ceil, isnan            # Ceiling, IsNaN
 import numpy as np                      # Numpy 3D array/matrix
 import h5py                             # Alternative to numpy array
+import psutil                           # Checking if blender is running
 
 # import matplotlib.pyplot as plt
 # import matplotlib
@@ -26,42 +27,53 @@ def browse_blender():
    print("Blender path: " + blender_path)
 
 def browse_npy():
-   global i_matrix_path, i_matrix_name, i_matrix_ext, i_matrix_dir
    # Note: FileDialog like 'askopenfilename' accepts **options:
    # parent, title, initialdir, initialfile, filetypes, defaultextension, multiple
    # Note: filetypes = a sequence of (label, pattern) tuples, ‘*’ wildcard is allowed
-   i_matrix_path = fd.askopenfilename(initialdir = i_matrix_dir, filetypes = [('','.npy'),('','.h5py')])
-   i_matrix_name = i_matrix_path.split('/')[-1].split('.')[0]
-   i_matrix_ext = i_matrix_path.split('.')[-1]
-   i_matrix_dir = i_matrix_path[0 : i_matrix_path.rfind('/') + 1]
+   matrix_path = fd.askopenfilename(initialdir = i_matrix_dir, filetypes = [('','.npy'),('','.h5py')])
+   set_matrix_path(matrix_path)
    browseEntry.delete(0,300)
    browseEntry.insert(0, i_matrix_path)
    load_matrix()
 
+def set_matrix_path(matrix_path):
+   global i_matrix_path, i_matrix_name, i_matrix_ext, i_matrix_dir
+   i_matrix_path = matrix_path
+   i_matrix_name = i_matrix_path.split('/')[-1].split('.')[0]
+   i_matrix_ext = i_matrix_path.split('.')[-1]
+   i_matrix_dir = i_matrix_path[0 : i_matrix_path.rfind('/') + 1]
+
 def load_settings():
    global i_matrix_path, MatA, MatB, width, length, height, layer, grid
    print("Loading settings: " + i_settings_path)
-   # read settings
-   with open(i_settings_path) as f:
-      settings = f.read().splitlines()
-   # set settings
-   for line, text in enumerate(settings):
-      if line == 0:
-         i_matrix_path = text
-      elif text.find("MatA") != -1:
-         MatA = float(text.split("=")[1])
-      elif text.find("MatB") != -1:
-         MatB = float(text.split("=")[1])
-      elif text.find("width") != -1:
-         width = float(text.split("=")[1])
-      elif text.find("length") != -1:
-         length = float(text.split("=")[1])
-      elif text.find("height") != -1:
-         height = float(text.split("=")[1])
-      elif text.find("layer") != -1:
-         layer = float(text.split("=")[1])
-      elif text.find("grid") != -1:
-         grid = float(text.split("=")[1])
+   try:
+      # read settings
+      with open(i_settings_path) as f:
+         settings = f.read().splitlines()
+      f.close()
+      # set settings
+      for line, text in enumerate(settings):
+         if line == 0:
+            set_matrix_path(text)
+         elif text.find("MatA") != -1:
+            MatA = float(text.split("=")[1])
+         elif text.find("MatB") != -1:
+            MatB = float(text.split("=")[1])
+         elif text.find("width") != -1:
+            width = float(text.split("=")[1])
+         elif text.find("length") != -1:
+            length = float(text.split("=")[1])
+         elif text.find("height") != -1:
+            height = float(text.split("=")[1])
+         elif text.find("layer") != -1:
+            layer = float(text.split("=")[1])
+         elif text.find("grid") != -1:
+            grid = float(text.split("=")[1])
+   except FileNotFoundError:
+      print("No settings file present")
+      return False
+   return True
+
 
 def save_settings():
    global MatA, MatB, width, length, height, grid
@@ -85,28 +97,40 @@ def save_settings():
    print("Saved settings: " + i_settings_path)
 
 def load_matrix():
-   global matrix, matrix_shape, matrix_downscaled
-   print("Loading matrix from file: " + i_matrix_path)
-   print("Matrix file extension: " + i_matrix_ext)
-   if (i_matrix_ext == "npy"):
-      matrix = np.load(i_matrix_path)
-   elif (i_matrix_ext == "h5py"):
-      matrix = h5py.File(i_matrix_path, 'r')
-   matrix_shape = np.shape(matrix)
-   # show_matrix()
-   # (Z,Y,X) = matrix_shape
-   # layer = float(layerEntry.get())
-   # grid = float(gridEntry.get())
-   # matrix_downscaled = matrix[::round(Z/layer),::round(Y/grid),::round(X/grid)]
-   # print(matrix_downscaled.shape)
-   # generate_matrix()
-   # show_matrix_downscaled()
+   try:
+      global matrix, matrix_shape
+      print("Loading matrix from file: " + i_matrix_path)
+      print("Matrix file extension: " + i_matrix_ext)
+      if (i_matrix_ext == "npy"):
+         matrix = np.load(i_matrix_path)
+      elif (i_matrix_ext == "h5py"):
+         matrix = h5py.File(i_matrix_path, 'r')
+      matrix_shape = np.shape(matrix)
+      # show_matrix()
+      # (Z,Y,X) = matrix_shape
+      # layer = float(layerEntry.get())
+      # grid = float(gridEntry.get())
+      # matrix_downscaled = matrix[::round(Z/layer),::round(Y/grid),::round(X/grid)]
+      # print(matrix_downscaled.shape)
+      # generate_matrix()
+      # show_matrix_downscaled()
+   except FileNotFoundError:
+      print("Matrix file not found")
+      return False
+   return True
 
 def run_macro():
    # save settings:
    save_settings()
-   # TODO: Avoid opening new blender process if one exists
-   Popen([blender_path, blender_macro_path], stdout = PIPE, stderr = PIPE)
+   # check if blender is running
+   running = False
+   for pid in psutil.pids():
+        p = psutil.Process(pid)
+        if p.name() == "blender.exe" and len(p.cmdline()) > 1 and blender_macro_file in p.cmdline()[1]:
+            running = True
+   # run blender if not open
+   if not running:
+      Popen([blender_path, blender_macro_path], stdout = PIPE, stderr = PIPE)
 
 
 # def show_matrix():
@@ -199,16 +223,11 @@ print("Workspace directory: " + workspace_dir)
 #       and 'dir' signifies 'directory'.
 
 # Settings.txt file is expected in the workspace directory
-i_settings_file = "Settings.txt"
+i_settings_file = "Settings.ini"
 i_settings_path = workspace_dir + i_settings_file
 
-
-i_matrix_name = "index_profile"
-i_matrix_ext = "npy"
-i_matrix_dir = workspace_dir + "Input Matrix/"
-i_matrix_path = i_matrix_dir + i_matrix_name + "." + i_matrix_ext
-o_matrix_dir = workspace_dir + "Output Matrices/"
-blender_macro_path = workspace_dir + "Square Grid.blend"
+blender_macro_file = "Square Grid.blend"
+blender_macro_path = workspace_dir + blender_macro_file
 
 # set default values
 matrix = np.matrix
@@ -218,11 +237,16 @@ width, length, height = 10, 10, 10
 layer, grid = 10, 10
 MatA, MatB = 1, 2
 
-# load settings, if any
-load_settings()
 
-# load the matrix, if any
-load_matrix()
+# load settings and matrix from settings
+if not(load_settings() and load_matrix()):
+   # load matrix from default directory if settings fail
+   i_matrix_name = "index_profile"
+   i_matrix_ext = "npy"
+   i_matrix_dir = workspace_dir + "Input Matrix/"
+   i_matrix_path = i_matrix_dir + i_matrix_name + "." + i_matrix_ext
+   load_matrix()
+
 
 # GUI root element
 root = tk.Tk()
