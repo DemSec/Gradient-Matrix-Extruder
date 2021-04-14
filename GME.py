@@ -130,6 +130,7 @@ def run_macro():
          running = True
    # run blender if not open
    if not running:
+      print("Running Blender: " + blender_macro_path)
       Popen([blender_path, blender_macro_path], stdout = PIPE, stderr = PIPE)
 
 
