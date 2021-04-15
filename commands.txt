@@ -1,6 +1,0 @@
-pip install pyinstaller
-pip install requests
-pyinstaller --onefile GME.py --name "GME" --clean --noconfirm
-
-TODO: Fix:
-pyinstaller --onefile GME.py --name "GME" --clean --noconfirm --noconsole

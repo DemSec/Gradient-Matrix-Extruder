@@ -5,7 +5,7 @@ from tkinter.messagebox import showinfo # MessageBox
 import os                               # Locating path
 import winreg                           # Reading file extension assosiations
 from subprocess import Popen, PIPE      # Opening Blender
-from math import ceil, isnan            # Ceiling, IsNaN
+from math import floor, isnan           # Floor, IsNaN
 import numpy as np                      # Numpy 3D array/matrix
 import h5py                             # Alternative to numpy array
 import psutil                           # Checking if blender is running
@@ -120,7 +120,7 @@ def load_matrix():
    return True
 
 def run_macro():
-   # save settings:
+   # save settings
    save_settings()
    # check if blender is running
    running = False
@@ -196,8 +196,6 @@ def height_changed(event):
    lengthEntry.delete(0,10)
    lengthEntry.insert(0, "{:.2f}".format(Y))
 
-
-
 # ==================================== MAIN ====================================
 
 # get Blender executable path:
@@ -238,7 +236,6 @@ width, length, height = 10, 10, 10
 layer, grid = 10, 10
 MatA, MatB = 1, 2
 
-
 # load settings and matrix from settings
 if not(load_settings() and load_matrix()):
    # load matrix from default directory if settings fail
@@ -247,7 +244,6 @@ if not(load_settings() and load_matrix()):
    i_matrix_dir = workspace_dir + "Input Matrix/"
    i_matrix_path = i_matrix_dir + i_matrix_name + "." + i_matrix_ext
    load_matrix()
-
 
 # GUI root element
 root = tk.Tk()
