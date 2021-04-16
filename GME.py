@@ -308,7 +308,7 @@ mid_frame.pack(side = tk.TOP)
 
 # botom entry boxes
 
-widthLabel = tk.Label(botom_frame, text="Width:", pady=10)
+widthLabel = tk.Label(botom_frame, text="Width (inch):", pady=10)
 widthLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 widthEntry = tk.Entry(botom_frame, width=10)
@@ -316,7 +316,7 @@ widthEntry.bind('<Return>',width_changed)
 widthEntry.pack(side = tk.LEFT,padx=10, pady=10)
 widthEntry.insert(0, "{:.2f}".format(width))
 
-lengthLabel = tk.Label(botom_frame, text="Length:", pady=10)
+lengthLabel = tk.Label(botom_frame, text="Length (inch):", pady=10)
 lengthLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 lengthEntry = tk.Entry(botom_frame, width=10)
@@ -324,7 +324,7 @@ lengthEntry.bind('<Return>',length_changed)
 lengthEntry.pack(side = tk.LEFT,padx=10, pady=10)
 lengthEntry.insert(0, "{:.2f}".format(length))
 
-heightLabel = tk.Label(botom_frame, text="Height:", pady=10)
+heightLabel = tk.Label(botom_frame, text="Height (inch):", pady=10)
 heightLabel.pack(side = tk.LEFT,padx=10, pady=10)
 
 heightEntry = tk.Entry(botom_frame, width=10)
