@@ -6,6 +6,7 @@ import os                               # Locating path
 import winreg                           # Reading file extension assosiations
 from subprocess import Popen, PIPE      # Opening Blender
 from math import floor, isnan           # Floor, IsNaN
+# not built-in
 import numpy as np                      # Numpy 3D array/matrix
 import h5py                             # Alternative to numpy array
 import psutil                           # Checking if blender is running

@@ -1,5 +1,11 @@
-:: pip install pyinstaller
-:: pip install requests
+:: install libraries for building binaries
+pip install pyinstaller
+pip install requests
+:: install required libraries for GME
+pip install numpy
+pip install h5py
+pip install psutil
+pip install matplotlib
 
 :: build the binary
 pyinstaller --onefile GME.py --name "GME" --clean --noconfirm
