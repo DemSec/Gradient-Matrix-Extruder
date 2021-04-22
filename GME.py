@@ -9,8 +9,8 @@ from math import floor, isnan           # Floor, IsNaN
 import numpy as np                      # Numpy 3D array/matrix
 import h5py                             # Alternative to numpy array
 import psutil                           # Checking if blender is running
+import matplotlib.pyplot as plt         # Show matrix
 
-# import matplotlib.pyplot as plt
 # import matplotlib
 # matplotlib.use('TkAgg')
 # from numpy import MAXDIMS, arange, sin, pi
@@ -35,6 +35,7 @@ def browse_npy():
    browseEntry.delete(0,300)
    browseEntry.insert(0, i_matrix_path)
    load_matrix()
+   show_matrix()
 
 def set_matrix_path(matrix_path):
    global i_matrix_path, i_matrix_name, i_matrix_ext, i_matrix_dir
@@ -134,15 +135,15 @@ def run_macro():
       Popen([blender_path, blender_macro_path], stdout = PIPE, stderr = PIPE)
 
 
-# def show_matrix():
-#    z_slice = 1  # slice along Z to plot
-#    plt.imshow(matrix[z_slice, :, :], origin='lower')  # plotting a z-axis cross section
-#    plt.colorbar()
-#    plt.figure()
-#    plt.imshow(matrix[:, int(matrix.shape[1]/2), :], origin='lower')  # plotting a ZX cross section down the center
-#    plt.colorbar()
-
-#    plt.show()
+def show_matrix():
+   z_slice = 1  # slice along Z to plot
+   plt.figure()
+   plt.imshow(matrix[z_slice, :, :], origin='lower')  # plotting a z-axis cross section
+   plt.colorbar()
+   plt.figure()
+   plt.imshow(matrix[:, int(matrix.shape[1]/2), :], origin='lower')  # plotting a ZX cross section down the center
+   plt.colorbar()
+   plt.show()
 
 
 # def show_matrix_downscaled():
@@ -203,8 +204,8 @@ blender_ext = ".blend"
 blender_query = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{blender_ext}")
 blender_path = winreg.QueryValue(winreg.HKEY_LOCAL_MACHINE, fr"SOFTWARE\Classes\{blender_query}\shell\open\command")
 print("Blender query result: " + blender_path)
-if blender_path.find("Blender\\") != -1:
-   blender_path = blender_path[1 : blender_path.find("Blender\\") + 8] + "blender.exe"
+if blender_path.find("\\blender.exe") != -1:
+   blender_path = blender_path[1 : blender_path.find("\\blender.exe") + 12]
    print("Blender found: " + blender_path)
 else:
    print("Blender not found, please browse to Blender.exe")
