@@ -1,4 +1,3 @@
-/__pycache__
-/build
-/Input Matrix
-/Output Matrices
+__pycache__/
+build/
+_Old/
